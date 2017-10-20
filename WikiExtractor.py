@@ -57,6 +57,7 @@ collecting template definitions.
 from __future__ import unicode_literals, division
 
 import sys
+import nltk
 import argparse
 import bz2
 import codecs
@@ -569,13 +570,14 @@ class Extractor(object):
             footer = "\n</doc>\n"
             if out == sys.stdout:   # option -a or -o -
                 header = header.encode('utf-8')
-            out.write(header)
+            # out.write(header)
             for line in text:
                 if out == sys.stdout:   # option -a or -o -
                     line = line.encode('utf-8')
-                out.write(line)
-                out.write('\n')
-            out.write(footer)
+                for sent in nltk.tokenize.sent_tokenize(line):
+                    out.write(sent)
+                    out.write('\n')
+            # out.write(footer)
 
     def extract(self, out):
         """
@@ -2401,7 +2403,7 @@ def makeInternalLink(title, label):
         if colon2 > 1 and title[colon + 1:colon2] not in options.acceptedNamespaces:
             return ''
     if options.keepLinks:
-        return '<a href="%s">%s</a>' % (quote(title.encode('utf-8')), label)
+        return '<int||| href="%s">%s</int|||>' % (quote(title.encode('utf-8')), label)
     else:
         return label
 
@@ -2479,7 +2481,7 @@ def replaceExternalLinks(text):
 def makeExternalLink(url, anchor):
     """Function applied to wikiLinks"""
     if options.keepLinks:
-        return '<a href="%s">%s</a>' % (quote(url.encode('utf-8')), anchor)
+        return '<ext||| href="%s">%s</ext|||>' % (quote(url.encode('utf-8')), anchor)
     else:
         return anchor
 
@@ -2648,7 +2650,7 @@ class NextFile(object):
     Synchronous generation of next available file name.
     """
 
-    filesPerDir = 100
+    filesPerDir = 1000000
 
     def __init__(self, path_name):
         self.path_name = path_name
@@ -3012,6 +3014,7 @@ def extract_process(opts, i, jobs_queue, output_queue):
         else:
             logging.debug('Quit extractor')
             break
+
     out.close()
 
 
