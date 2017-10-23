@@ -57,7 +57,7 @@ collecting template definitions.
 from __future__ import unicode_literals, division
 
 import sys
-import nltk
+from nltk.tokenize.punkt import PunktSentenceTokenizer as PST
 import argparse
 import bz2
 import codecs
@@ -539,6 +539,7 @@ class Extractor(object):
         self.recursion_exceeded_2_errs = 0  # template recursion within expandTemplate()
         self.recursion_exceeded_3_errs = 0  # parameter recursion
         self.template_title_errs = 0
+        self.pst = PST()
 
     def write_output(self, out, text):
         """
@@ -574,7 +575,7 @@ class Extractor(object):
             for line in text:
                 if out == sys.stdout:   # option -a or -o -
                     line = line.encode('utf-8')
-                for sent in nltk.tokenize.sent_tokenize(line):
+                for sent in self.pst.tokenize(line):
                     out.write(sent)
                     out.write('\n')
             # out.write(footer)
